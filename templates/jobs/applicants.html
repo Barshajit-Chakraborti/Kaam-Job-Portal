@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Applicants{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+  {% if job %}
+    <a href="{% url 'jobs:employer_dashboard' %}" class="text-sm font-medium text-muted hover:text-ink">Back to dashboard</a>
+    <h1 class="mt-2 font-display text-3xl font-bold">Applicants for {{ job.title }}</h1>
+  {% else %}
+    <h1 class="font-display text-3xl font-bold">All applicants</h1>
+  {% endif %}
+  <p class="mt-1 text-sm text-muted">Showing {{ page_obj.paginator.count }} of {{ total_for_scope }} applicant{{ total_for_scope|pluralize }}.</p>
+
+  {% has_filters as filtered %}
+  <details class="mt-6 rounded-2xl border border-line bg-white" {% if filtered %}open{% endif %}>
+    <summary class="flex items-center justify-between px-5 py-4 font-display text-lg font-bold">
+      <span>Filter applicants</span>
+      <span class="text-sm font-medium text-brand">{% if filtered %}Filters on{% else %}Show filters{% endif %}</span>
+    </summary>
+    <form method="get" class="border-t border-line px-5 pb-5 pt-4">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {% include "partials/_field.html" with field=form.q bare=True %}
+        {% if form.job %}{% include "partials/_field.html" with field=form.job bare=True %}{% endif %}
+        {% include "partials/_field.html" with field=form.education_level bare=True %}
+        {% include "partials/_field.html" with field=form.degree bare=True %}
+        {% include "partials/_field.html" with field=form.grad_year_from bare=True %}
+        {% include "partials/_field.html" with field=form.grad_year_to bare=True %}
+        {% include "partials/_field.html" with field=form.min_cgpa bare=True %}
+        {% include "partials/_field.html" with field=form.min_experience bare=True %}
+        {% include "partials/_field.html" with field=form.work_mode bare=True %}
+        {% include "partials/_field.html" with field=form.skills bare=True %}
+        {% include "partials/_field.html" with field=form.status bare=True %}
+        {% include "partials/_field.html" with field=form.sort bare=True %}
+      </div>
+      <div class="mt-5 flex items-center gap-3">
+        <button type="submit" class="rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark">Apply filters</button>
+        {% if filtered %}<a href="{{ request.path }}" class="text-sm font-medium text-muted hover:text-ink">Clear</a>{% endif %}
+      </div>
+    </form>
+  </details>
+
+  {% if page_obj %}
+    <ul class="mt-6 divide-y divide-line rounded-2xl border border-line bg-white px-6">
+      {% for application in page_obj %}
+        {% with profile=application.applicant.seeker_profile %}
+        <li class="py-5">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <a href="{% url 'jobs:application_detail' application.pk %}" class="font-display text-lg font-bold hover:text-brand">{{ application.applicant.display_name }}</a>
+                {% include "partials/_status_badge.html" with status=application.status label=application.get_status_display %}
+                {% if profile %}
+                  {% include "partials/_work_mode_badge.html" with mode=profile.preferred_work_mode label=profile.get_preferred_work_mode_display %}
+                {% endif %}
+              </div>
+              <p class="mt-0.5 text-sm text-muted">{{ application.applicant.email }}{% if not job %} - applied for {{ application.job.title }}{% endif %}, {{ application.applied_at|date:"j M Y" }}</p>
+              {% if profile %}
+                <p class="mt-3 text-sm">
+                  <span class="font-medium">{{ profile.get_education_level_display|truncatechars:24 }}</span>
+                  {% if profile.education_summary %}- {{ profile.education_summary }}{% endif %}
+                  {% if profile.institution %}at {{ profile.institution }}{% endif %}
+                  {% if profile.graduation_year %}({{ profile.graduation_year }}){% endif %}
+                </p>
+                <p class="mt-1 text-sm text-muted">
+                  {% if profile.cgpa %}CGPA {{ profile.cgpa }}, {% endif %}{{ profile.experience_years }} yr{{ profile.experience_years|pluralize }} experience{% if profile.skills %}. Skills: {{ profile.skills }}{% endif %}
+                </p>
+              {% endif %}
+            </div>
+
+            <div class="flex shrink-0 flex-wrap items-center gap-2">
+              <form method="post" action="{% url 'jobs:application_status' application.pk %}" class="flex items-center gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <label class="sr-only" for="status-{{ application.pk }}">Status</label>
+                <select id="status-{{ application.pk }}" name="status" class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm">
+                  {% for value, label in statuses %}<option value="{{ value }}" {% if value == application.status %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+                <button type="submit" class="rounded-lg border border-line px-3 py-2 text-sm font-medium hover:bg-tint">Update</button>
+              </form>
+              {% if profile.resume %}
+                <a href="{% url 'jobs:resume' profile.pk %}" target="_blank" class="rounded-lg bg-ink px-3.5 py-2 text-sm font-medium text-white">Resume</a>
+              {% endif %}
+            </div>
+          </div>
+        </li>
+        {% endwith %}
+      {% endfor %}
+    </ul>
+    {% include "partials/_pagination.html" %}
+  {% else %}
+    <div class="mt-6 rounded-2xl border border-dashed border-line bg-white p-10 text-center">
+      {% if filtered %}
+        <p class="font-display text-xl font-bold">No applicants match these filters</p>
+        <p class="mt-2 text-sm text-muted">Lower the CGPA or experience limit, or clear a filter.</p>
+        <a href="{{ request.path }}" class="mt-5 inline-block rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-tint">Clear filters</a>
+      {% else %}
+        <p class="font-display text-xl font-bold">No applications yet</p>
+        <p class="mt-2 text-sm text-muted">When job seekers apply, they will appear here.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

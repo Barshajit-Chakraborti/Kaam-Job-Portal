@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}{{ application.applicant.display_name }}{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+  <a href="{% url 'jobs:job_applicants' application.job.pk %}" class="text-sm font-medium text-muted hover:text-ink">Back to applicants for {{ application.job.title }}</a>
+
+  <div class="mt-4 rounded-2xl border border-line bg-white p-6 sm:p-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 class="font-display text-3xl font-bold">{{ application.applicant.display_name }}</h1>
+        {% if profile.headline %}<p class="mt-1 text-muted">{{ profile.headline }}</p>{% endif %}
+        <p class="mt-1 text-sm text-muted">{{ application.applicant.email }}{% if profile.phone %} - {{ profile.phone }}{% endif %}{% if profile.city %} - {{ profile.city }}{% endif %}</p>
+      </div>
+      <form method="post" action="{% url 'jobs:application_status' application.pk %}" class="flex items-center gap-2">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <label for="status" class="sr-only">Status</label>
+        <select id="status" name="status" class="rounded-lg border border-line bg-white px-2.5 py-2 text-sm">
+          {% for value, label in statuses %}<option value="{{ value }}" {% if value == application.status %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="rounded-lg bg-brand px-3.5 py-2 text-sm font-semibold text-white hover:bg-brand-dark">Update status</button>
+      </form>
+    </div>
+
+    {% if profile %}
+    <dl class="mt-8 grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
+      <div><dt class="text-muted">Highest education</dt><dd class="font-medium">{{ profile.get_education_level_display }}</dd></div>
+      <div><dt class="text-muted">Degree and branch</dt><dd class="font-medium">{{ profile.education_summary }}</dd></div>
+      <div><dt class="text-muted">College</dt><dd class="font-medium">{{ profile.institution|default:"Not given" }}</dd></div>
+      <div><dt class="text-muted">Graduation year and CGPA</dt><dd class="font-medium">{{ profile.graduation_year|default:"-" }}{% if profile.cgpa %}, CGPA {{ profile.cgpa }}{% endif %}</dd></div>
+      <div><dt class="text-muted">Experience</dt><dd class="font-medium">{{ profile.experience_years }} year{{ profile.experience_years|pluralize }}</dd></div>
+      <div><dt class="text-muted">Preferred job type</dt><dd class="font-medium">{{ profile.get_preferred_work_mode_display }}</dd></div>
+    </dl>
+
+    {% if profile.skills %}
+      <h2 class="mt-8 font-display text-lg font-bold">Skills</h2>
+      <ul class="mt-2 flex flex-wrap gap-2">{% for skill in profile.skills|csv %}<li class="rounded-lg bg-tint px-3 py-1 text-sm text-brand">{{ skill }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if profile.about %}
+      <h2 class="mt-8 font-display text-lg font-bold">About</h2>
+      <p class="mt-2 whitespace-pre-line text-sm leading-relaxed">{{ profile.about }}</p>
+    {% endif %}
+
+    <div class="mt-8 flex flex-wrap gap-3 text-sm">
+      {% if profile.resume %}<a href="{% url 'jobs:resume' profile.pk %}" target="_blank" class="rounded-lg bg-ink px-4 py-2.5 font-medium text-white">Open resume (PDF)</a>{% endif %}
+      {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="rounded-lg border border-line px-4 py-2.5 font-medium hover:bg-tint">LinkedIn</a>{% endif %}
+      {% if profile.github_url %}<a href="{{ profile.github_url }}" target="_blank" rel="noopener noreferrer" class="rounded-lg border border-line px-4 py-2.5 font-medium hover:bg-tint">GitHub</a>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if application.cover_letter %}
+      <h2 class="mt-8 font-display text-lg font-bold">Note from the applicant</h2>
+      <p class="mt-2 whitespace-pre-line rounded-lg bg-paper p-4 text-sm leading-relaxed">{{ application.cover_letter }}</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

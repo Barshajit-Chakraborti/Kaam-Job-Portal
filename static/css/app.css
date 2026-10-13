@@ -1,0 +1,13 @@
+/* Small hand-written layer on top of Tailwind. */
+html { scroll-behavior: smooth; }
+body { -webkit-font-smoothing: antialiased; }
+
+:focus-visible { outline: 2px solid #3B4BDB; outline-offset: 2px; }
+
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

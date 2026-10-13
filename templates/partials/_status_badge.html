@@ -1,0 +1,5 @@
+<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+  {% if status == 'applied' %}bg-tint text-brand
+  {% elif status == 'shortlisted' %}bg-amber-100 text-amber-900
+  {% elif status == 'hired' %}bg-emerald-100 text-emerald-900
+  {% else %}bg-red-100 text-red-800{% endif %}">{{ label }}</span>

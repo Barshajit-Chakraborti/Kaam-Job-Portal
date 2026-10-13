@@ -1,0 +1,13 @@
+{# Usage: {% include "partials/_field.html" with field=form.email wide=True bare=True %} #}
+<div class="{% if wide %}sm:col-span-2{% endif %}">
+  {% if field.field.widget.input_type == "checkbox" %}
+    <label class="flex items-center gap-2 text-sm text-ink">{{ field }}<span>{{ field.label }}</span></label>
+  {% else %}
+    <label for="{{ field.id_for_label }}" class="mb-1.5 block text-sm font-medium text-ink">
+      {{ field.label }}{% if not field.field.required and not bare %}<span class="font-normal text-muted"> (optional)</span>{% endif %}
+    </label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text %}<p class="mt-1.5 text-xs text-muted">{{ field.help_text }}</p>{% endif %}
+  {% for error in field.errors %}<p class="mt-1.5 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+</div>

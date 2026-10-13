@@ -1,0 +1,14 @@
+{% if messages %}
+<div class="mx-auto w-full max-w-6xl space-y-2 px-4 pt-4 sm:px-6" role="status">
+  {% for message in messages %}
+    <div data-flash class="flex items-start justify-between gap-3 rounded-lg border px-4 py-3 text-sm
+      {% if message.tags == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-900
+      {% elif message.tags == 'error' %}border-red-200 bg-red-50 text-red-900
+      {% elif message.tags == 'warning' %}border-amber-200 bg-amber-50 text-amber-900
+      {% else %}border-line bg-tint text-ink{% endif %}">
+      <p>{{ message }}</p>
+      <button type="button" data-dismiss class="-mr-1 rounded p-1 opacity-60 hover:opacity-100" aria-label="Dismiss">&times;</button>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}

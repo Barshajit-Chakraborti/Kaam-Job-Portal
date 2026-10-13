@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Job seeker sign up{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+  <h1 class="font-display text-3xl font-bold">Create your job seeker account</h1>
+  <p class="mt-2 text-sm text-muted">Employers use your education details and job type preference to find you. You can edit all of this later.
+    Already registered? <a href="{% url 'accounts:login' %}" class="font-medium text-brand hover:underline">Log in</a>.</p>
+
+  <form method="post" class="mt-8 space-y-8" novalidate>
+    {% csrf_token %}
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">Account</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=user_form.first_name %}
+        {% include "partials/_field.html" with field=user_form.last_name %}
+        {% include "partials/_field.html" with field=user_form.email wide=True %}
+        {% include "partials/_field.html" with field=user_form.password1 %}
+        {% include "partials/_field.html" with field=user_form.password2 %}
+      </div>
+    </fieldset>
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">Education</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=profile_form.education_level %}
+        {% include "partials/_field.html" with field=profile_form.degree %}
+        {% include "partials/_field.html" with field=profile_form.field_of_study %}
+        {% include "partials/_field.html" with field=profile_form.institution %}
+        {% include "partials/_field.html" with field=profile_form.graduation_year %}
+        {% include "partials/_field.html" with field=profile_form.cgpa %}
+      </div>
+    </fieldset>
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">Work</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=profile_form.experience_years %}
+        {% include "partials/_field.html" with field=profile_form.skills %}
+        {% include "partials/_radio_cards.html" with field=profile_form.preferred_work_mode %}
+      </div>
+    </fieldset>
+
+    <button type="submit" class="w-full rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white hover:bg-brand-dark sm:w-auto">Create account</button>
+  </form>
+</section>
+{% endblock %}

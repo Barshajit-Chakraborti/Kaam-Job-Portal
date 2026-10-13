@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Find work or find people{% endblock %}
+
+{% block content %}
+<section id="start" class="mx-auto max-w-6xl px-4 pb-6 pt-10 sm:px-6 sm:pt-14">
+  <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <h1 class="max-w-xl font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">Are you hiring, or looking for work?</h1>
+  </div>
+
+  {% if user.is_authenticated %}
+    <div class="rounded-2xl border border-line bg-white p-8 text-center">
+      <p class="font-display text-2xl font-bold">Welcome back, {{ user.first_name|default:user.email }}.</p>
+      <a href="{% url 'accounts:dashboard' %}" class="mt-5 inline-block rounded-lg bg-brand px-5 py-3 text-sm font-medium text-white hover:bg-brand-dark">Go to my dashboard</a>
+    </div>
+  {% else %}
+    <div class="grid gap-5 md:grid-cols-2">
+      <a href="{% url 'accounts:signup_seeker' %}" class="group flex min-h-[24rem] flex-col justify-between rounded-2xl bg-brand p-8 text-white transition-colors hover:bg-brand-dark sm:p-10">
+        <div>
+          <p class="font-display text-4xl font-bold leading-tight sm:text-5xl">I'm looking for a job</p>
+          <p class="mt-5 max-w-sm text-base text-white/85">Filter openings by work mode, job type, experience and the education level they ask for. Apply in one click and follow every application's status.</p>
+        </div>
+        <span class="mt-10 inline-flex w-fit rounded-lg bg-white px-5 py-3 text-sm font-semibold text-brand">Create a job seeker account</span>
+      </a>
+
+      <a href="{% url 'accounts:signup_employer' %}" class="group flex min-h-[24rem] flex-col justify-between rounded-2xl border border-line bg-white p-8 transition-colors hover:border-ink sm:p-10">
+        <div>
+          <p class="font-display text-4xl font-bold leading-tight sm:text-5xl">I'm hiring</p>
+          <p class="mt-5 max-w-sm text-base text-muted">Post openings, then sort the people who applied by education level, degree, graduation year, CGPA, experience, skills and preferred job type.</p>
+        </div>
+        <span class="mt-10 inline-flex w-fit rounded-lg bg-ink px-5 py-3 text-sm font-semibold text-white">Create an employer account</span>
+      </a>
+    </div>
+
+    <p class="mt-6 text-sm text-muted">
+      Already have an account?
+      <a href="{% url 'accounts:login' %}" class="ml-1 inline-block rounded-lg border border-line bg-white px-3.5 py-1.5 font-medium text-ink hover:bg-tint">Log in</a>
+    </p>
+  {% endif %}
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+  <div class="grid gap-10 md:grid-cols-2">
+    <div>
+      <h2 class="font-display text-2xl font-bold">For job seekers</h2>
+      <ul class="mt-4 space-y-3 text-sm leading-relaxed text-muted">
+        <li>Tell us your education, branch, graduation year, CGPA and whether you prefer remote or onsite work once. Change it any time.</li>
+        <li>Search by keyword, city, salary, job type and work mode, or tick one box to match your preference.</li>
+        <li>Upload a PDF resume that only employers you applied to can open.</li>
+        <li>Get an email when an employer shortlists or updates your application.</li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="font-display text-2xl font-bold">For employers</h2>
+      <ul class="mt-4 space-y-3 text-sm leading-relaxed text-muted">
+        <li>Post a job with the education level, experience and CGPA you expect, plus salary and a deadline.</li>
+        <li>Narrow applicants by highest education, degree or branch, graduation year range and minimum CGPA.</li>
+        <li>See who wants remote and who wants onsite work before you reach out.</li>
+        <li>Move people through applied, shortlisted, hired or rejected from a single screen.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

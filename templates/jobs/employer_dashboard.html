@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Employer dashboard{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-bold">{{ user.employer_profile.company_name|default:"Your jobs" }}</h1>
+      <p class="mt-1 text-sm text-muted">Manage openings and review the people who applied.</p>
+    </div>
+    <a href="{% url 'jobs:create' %}" class="rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark">Post a job</a>
+  </div>
+
+  <dl class="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div class="rounded-2xl border border-line bg-white p-5"><dt class="text-sm text-muted">Open jobs</dt><dd class="mt-1 font-display text-3xl font-bold">{{ stats.active_jobs }}</dd></div>
+    <div class="rounded-2xl border border-line bg-white p-5"><dt class="text-sm text-muted">Total applicants</dt><dd class="mt-1 font-display text-3xl font-bold">{{ stats.total_applicants }}</dd></div>
+    <div class="rounded-2xl border border-line bg-white p-5"><dt class="text-sm text-muted">New this week</dt><dd class="mt-1 font-display text-3xl font-bold">{{ stats.new_applicants }}</dd></div>
+    <div class="rounded-2xl border border-line bg-white p-5"><dt class="text-sm text-muted">Shortlisted</dt><dd class="mt-1 font-display text-3xl font-bold">{{ stats.shortlisted }}</dd></div>
+  </dl>
+
+  <h2 class="mt-10 font-display text-xl font-bold">Your jobs</h2>
+  {% if jobs %}
+    <ul class="mt-4 divide-y divide-line rounded-2xl border border-line bg-white px-6">
+      {% for job in jobs %}
+        <li class="flex flex-col gap-4 py-5 lg:flex-row lg:items-center lg:justify-between">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <a href="{% url 'jobs:detail' job.pk %}" class="font-display text-lg font-bold hover:text-brand">{{ job.title }}</a>
+              {% include "partials/_work_mode_badge.html" with mode=job.work_mode label=job.get_work_mode_display %}
+              {% if job.is_open %}
+                <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-900">Open</span>
+              {% else %}
+                <span class="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-700">Closed</span>
+              {% endif %}
+            </div>
+            <p class="mt-1 text-sm text-muted">Posted {{ job.created_at|date:"j M Y" }}{% if job.deadline %}, apply by {{ job.deadline|date:"j M Y" }}{% endif %}</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <a href="{% url 'jobs:job_applicants' job.pk %}" class="rounded-lg bg-ink px-3.5 py-2 text-sm font-medium text-white">{{ job.applicant_count }} applicant{{ job.applicant_count|pluralize }}</a>
+            <a href="{% url 'jobs:update' job.pk %}" class="rounded-lg border border-line px-3.5 py-2 text-sm font-medium hover:bg-tint">Edit</a>
+            <form method="post" action="{% url 'jobs:toggle' job.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="rounded-lg border border-line px-3.5 py-2 text-sm font-medium hover:bg-tint">{% if job.is_active %}Close{% else %}Reopen{% endif %}</button>
+            </form>
+            <a href="{% url 'jobs:delete' job.pk %}" class="rounded-lg px-3.5 py-2 text-sm font-medium text-red-600 hover:bg-red-50">Delete</a>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="mt-4 rounded-2xl border border-dashed border-line bg-white p-10 text-center">
+      <p class="font-display text-xl font-bold">You haven't posted a job yet</p>
+      <p class="mt-2 text-sm text-muted">Add the role, the education you expect and the salary range. Applicants appear here.</p>
+      <a href="{% url 'jobs:create' %}" class="mt-5 inline-block rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark">Post your first job</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

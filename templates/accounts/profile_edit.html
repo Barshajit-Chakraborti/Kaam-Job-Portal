@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Your profile{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h1 class="font-display text-3xl font-bold">Your profile</h1>
+      <p class="mt-1 text-sm text-muted">{{ user.email }}</p>
+    </div>
+    <a href="{% url 'accounts:password_change' %}" class="rounded-lg border border-line bg-white px-3.5 py-2 text-sm font-medium hover:bg-tint">Change password</a>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="mt-8 space-y-8" novalidate>
+    {% csrf_token %}
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">Name</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=name_form.first_name %}
+        {% include "partials/_field.html" with field=name_form.last_name %}
+      </div>
+    </fieldset>
+
+    {% if user.role == 'seeker' %}
+      <fieldset class="rounded-2xl border border-line bg-white p-6">
+        <legend class="px-2 font-display text-lg font-bold">Education</legend>
+        <div class="grid gap-5 sm:grid-cols-2">
+          {% include "partials/_field.html" with field=profile_form.education_level %}
+          {% include "partials/_field.html" with field=profile_form.degree %}
+          {% include "partials/_field.html" with field=profile_form.field_of_study %}
+          {% include "partials/_field.html" with field=profile_form.institution %}
+          {% include "partials/_field.html" with field=profile_form.graduation_year %}
+          {% include "partials/_field.html" with field=profile_form.cgpa %}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-2xl border border-line bg-white p-6">
+        <legend class="px-2 font-display text-lg font-bold">Work preferences</legend>
+        <div class="grid gap-5 sm:grid-cols-2">
+          {% include "partials/_radio_cards.html" with field=profile_form.preferred_work_mode %}
+          {% include "partials/_field.html" with field=profile_form.experience_years %}
+          {% include "partials/_field.html" with field=profile_form.skills %}
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-2xl border border-line bg-white p-6">
+        <legend class="px-2 font-display text-lg font-bold">About you</legend>
+        <div class="grid gap-5 sm:grid-cols-2">
+          {% include "partials/_field.html" with field=profile_form.headline wide=True %}
+          {% include "partials/_field.html" with field=profile_form.phone %}
+          {% include "partials/_field.html" with field=profile_form.city %}
+          {% include "partials/_field.html" with field=profile_form.about wide=True %}
+          {% include "partials/_field.html" with field=profile_form.linkedin_url %}
+          {% include "partials/_field.html" with field=profile_form.github_url %}
+          <div class="sm:col-span-2">
+            {% include "partials/_field.html" with field=profile_form.resume %}
+            {% if profile.resume %}
+              <p class="mt-2 text-sm"><a class="font-medium text-brand hover:underline" target="_blank" href="{% url 'jobs:resume' profile.pk %}">View current resume</a></p>
+            {% endif %}
+          </div>
+        </div>
+      </fieldset>
+    {% else %}
+      <fieldset class="rounded-2xl border border-line bg-white p-6">
+        <legend class="px-2 font-display text-lg font-bold">Company</legend>
+        <div class="grid gap-5 sm:grid-cols-2">
+          {% include "partials/_field.html" with field=profile_form.company_name wide=True %}
+          {% include "partials/_field.html" with field=profile_form.industry %}
+          {% include "partials/_field.html" with field=profile_form.company_size %}
+          {% include "partials/_field.html" with field=profile_form.location %}
+          {% include "partials/_field.html" with field=profile_form.website %}
+          {% include "partials/_field.html" with field=profile_form.about wide=True %}
+          {% include "partials/_field.html" with field=profile_form.logo wide=True %}
+        </div>
+      </fieldset>
+    {% endif %}
+
+    <button type="submit" class="rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark">Save changes</button>
+  </form>
+</section>
+{% endblock %}

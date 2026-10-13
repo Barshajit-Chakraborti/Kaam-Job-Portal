@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}{{ job.title }} at {{ job.company_name }}{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+  <a href="{% url 'jobs:list' %}" class="text-sm font-medium text-muted hover:text-ink">Back to all jobs</a>
+
+  <div class="mt-4 grid gap-8 lg:grid-cols-[1fr_22rem]">
+    <article class="rounded-2xl border border-line bg-white p-6 sm:p-8">
+      {% if not job.is_open %}
+        <p class="mb-4 rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-900">This job is closed to new applications. Only you can see it.</p>
+      {% endif %}
+      <h1 class="font-display text-3xl font-bold leading-tight">{{ job.title }}</h1>
+      <p class="mt-1 text-muted">{{ job.company_name }}{% if job.location %}, {{ job.location }}{% endif %}</p>
+
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        {% include "partials/_work_mode_badge.html" with mode=job.work_mode label=job.get_work_mode_display %}
+        <span class="rounded-full border border-line px-2.5 py-0.5 text-xs font-medium text-muted">{{ job.get_employment_type_display }}</span>
+        {% if job.salary_display %}<span class="text-sm font-semibold">{{ job.salary_display }}</span>{% endif %}
+      </div>
+
+      <h2 class="mt-8 font-display text-xl font-bold">About the role</h2>
+      <div class="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink/90">{{ job.description }}</div>
+
+      {% if job.requirements %}
+        <h2 class="mt-8 font-display text-xl font-bold">Requirements</h2>
+        <div class="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink/90">{{ job.requirements }}</div>
+      {% endif %}
+
+      {% if job.required_skills %}
+        <h2 class="mt-8 font-display text-xl font-bold">Skills</h2>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {% for skill in job.required_skills|csv %}<li class="rounded-lg bg-tint px-3 py-1 text-sm text-brand">{{ skill }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    </article>
+
+    <aside class="space-y-6">
+      <div class="rounded-2xl border border-line bg-white p-6">
+        <h2 class="font-display text-lg font-bold">What they ask for</h2>
+        <dl class="mt-3 space-y-2 text-sm">
+          <div class="flex justify-between gap-4"><dt class="text-muted">Education</dt><dd class="text-right font-medium">{{ job.get_min_education_display }}</dd></div>
+          <div class="flex justify-between gap-4"><dt class="text-muted">Experience</dt><dd class="font-medium">{% if job.min_experience_years %}{{ job.min_experience_years }}+ years{% else %}Freshers welcome{% endif %}</dd></div>
+          {% if job.min_cgpa %}<div class="flex justify-between gap-4"><dt class="text-muted">CGPA</dt><dd class="font-medium">{{ job.min_cgpa }}+</dd></div>{% endif %}
+          {% if job.deadline %}<div class="flex justify-between gap-4"><dt class="text-muted">Apply by</dt><dd class="font-medium">{{ job.deadline|date:"j M Y" }}</dd></div>{% endif %}
+        </dl>
+      </div>
+
+      <div class="rounded-2xl border border-line bg-white p-6">
+        {% if user.role == 'seeker' %}
+          {% if application %}
+            <h2 class="font-display text-lg font-bold">You applied</h2>
+            <p class="mt-2 text-sm text-muted">Sent {{ application.applied_at|date:"j M Y" }}. Current status:</p>
+            <div class="mt-2">{% include "partials/_status_badge.html" with status=application.status label=application.get_status_display %}</div>
+          {% elif job.is_open %}
+            <h2 class="font-display text-lg font-bold">Apply for this job</h2>
+            <form method="post" action="{% url 'jobs:apply' job.pk %}" class="mt-4 space-y-4">
+              {% csrf_token %}
+              {% include "partials/_field.html" with field=form.cover_letter %}
+              <button type="submit" class="w-full rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark">Send application</button>
+            </form>
+            <p class="mt-3 text-xs text-muted">Your profile and resume are shared with this employer when you apply.</p>
+          {% endif %}
+        {% elif user.role == 'employer' %}
+          {% if is_owner %}
+            <h2 class="font-display text-lg font-bold">Your posting</h2>
+            <div class="mt-4 flex flex-col gap-2">
+              <a href="{% url 'jobs:job_applicants' job.pk %}" class="rounded-lg bg-ink px-4 py-2.5 text-center text-sm font-semibold text-white">View applicants</a>
+              <a href="{% url 'jobs:update' job.pk %}" class="rounded-lg border border-line px-4 py-2.5 text-center text-sm font-medium hover:bg-tint">Edit job</a>
+            </div>
+          {% else %}
+            <p class="text-sm text-muted">You're signed in as an employer. Only job seeker accounts can apply.</p>
+          {% endif %}
+        {% else %}
+          <h2 class="font-display text-lg font-bold">Want to apply?</h2>
+          <p class="mt-2 text-sm text-muted">Create a free job seeker account, or log in if you already have one.</p>
+          <div class="mt-4 flex flex-col gap-2">
+            <a href="{% url 'accounts:signup_seeker' %}" class="rounded-lg bg-brand px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-brand-dark">Create an account</a>
+            <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="rounded-lg border border-line px-4 py-2.5 text-center text-sm font-medium hover:bg-tint">Log in</a>
+          </div>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

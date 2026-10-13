@@ -1,0 +1,91 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SITE_NAME }}{% endblock %} | {{ SITE_NAME }}</title>
+  <meta name="description" content="{% block description %}A job portal where employers post openings and job seekers filter and apply.{% endblock %}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  {% if TAILWIND_BUILT %}
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+  {% else %}
+    {# Development: Tailwind via CDN. Run `npm run build:css` for the compiled version. #}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: { extend: {
+          colors: {
+            ink: "#1C2340", brand: { DEFAULT: "#3B4BDB", dark: "#2C3AB8" }, tint: "#EEF0FF",
+            paper: "#F5F7FB", line: "#DDE1EE", muted: "#5B6479", remote: "#0E9F8E", onsite: "#B9620F"
+          },
+          fontFamily: {
+            display: ['"Bricolage Grotesque"', "ui-sans-serif", "system-ui", "sans-serif"],
+            sans: ['"Public Sans"', "ui-sans-serif", "system-ui", "sans-serif"]
+          }
+        } }
+      };
+    </script>
+  {% endif %}
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="flex min-h-full flex-col bg-paper font-sans text-ink">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">Skip to content</a>
+
+  <header class="border-b border-line bg-white">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6" aria-label="Main">
+      <a href="{% url 'core:home' %}" class="font-display text-2xl font-bold tracking-tight text-ink">{{ SITE_NAME|lower }}<span class="text-brand">.</span></a>
+
+      <button id="nav-toggle" class="rounded-lg border border-line p-2 md:hidden" aria-controls="nav-menu" aria-expanded="false" aria-label="Toggle menu">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+
+      <div id="nav-menu" class="absolute left-0 right-0 top-[57px] z-40 hidden flex-col gap-1 border-b border-line bg-white px-4 py-3 md:static md:flex md:flex-1 md:flex-row md:items-center md:justify-between md:border-0 md:p-0">
+        <div class="flex flex-col gap-1 md:flex-row md:items-center md:gap-1">
+          <a href="{% url 'jobs:list' %}" class="rounded-lg px-3 py-2 text-sm font-medium text-ink hover:bg-tint">Browse jobs</a>
+          {% if user.is_authenticated %}
+            {% if user.role == 'employer' %}
+              <a href="{% url 'jobs:employer_dashboard' %}" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-tint">Dashboard</a>
+              <a href="{% url 'jobs:applicants' %}" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-tint">Applicants</a>
+              <a href="{% url 'jobs:create' %}" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-tint">Post a job</a>
+            {% elif user.role == 'seeker' %}
+              <a href="{% url 'jobs:my_applications' %}" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-tint">My applications</a>
+            {% endif %}
+          {% endif %}
+        </div>
+
+        <div class="mt-2 flex flex-col gap-2 md:mt-0 md:flex-row md:items-center">
+          {% if user.is_authenticated %}
+            <a href="{% url 'accounts:profile' %}" class="rounded-lg px-3 py-2 text-sm font-medium hover:bg-tint">{{ user.display_name }}</a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="w-full rounded-lg border border-line px-3.5 py-2 text-sm font-medium hover:bg-tint md:w-auto">Log out</button>
+            </form>
+          {% else %}
+            <a href="{% url 'accounts:login' %}" class="rounded-lg border border-line px-3.5 py-2 text-center text-sm font-medium hover:bg-tint">Log in</a>
+            <a href="{% url 'core:home' %}#start" class="rounded-lg bg-brand px-3.5 py-2 text-center text-sm font-medium text-white hover:bg-brand-dark">Sign up</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  {% include "partials/_messages.html" %}
+
+  <main id="main" class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="border-t border-line bg-white">
+    <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <p>{{ SITE_NAME }} is a portfolio project built with Django and Tailwind CSS.</p>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/app.js' %}" defer></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Browse jobs{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+  <h1 class="font-display text-3xl font-bold">Open jobs</h1>
+  <p class="mt-1 text-sm text-muted">{{ page_obj.paginator.count }} job{{ page_obj.paginator.count|pluralize }} match{{ page_obj.paginator.count|pluralize:"es," }} your filters.</p>
+
+  <div class="mt-8 grid gap-8 lg:grid-cols-[18rem_1fr]">
+    <aside>
+      <details class="rounded-2xl border border-line bg-white lg:sticky lg:top-4" open>
+        <summary class="flex items-center justify-between px-5 py-4 font-display text-lg font-bold lg:pointer-events-none">Filters</summary>
+        <form method="get" class="space-y-4 px-5 pb-5">
+          {% include "partials/_field.html" with field=form.q bare=True %}
+          {% include "partials/_field.html" with field=form.location bare=True %}
+          {% include "partials/_field.html" with field=form.work_mode bare=True %}
+          {% include "partials/_field.html" with field=form.employment_type bare=True %}
+          {% include "partials/_field.html" with field=form.education bare=True %}
+          {% include "partials/_field.html" with field=form.experience bare=True %}
+          {% include "partials/_field.html" with field=form.min_salary bare=True %}
+          {% if user.role == 'seeker' %}{% include "partials/_field.html" with field=form.match_profile bare=True %}{% endif %}
+          {% include "partials/_field.html" with field=form.sort bare=True %}
+          <div class="flex items-center gap-3 pt-1">
+            <button type="submit" class="rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark">Apply filters</button>
+            {% has_filters as filtered %}
+            {% if filtered %}<a href="{% url 'jobs:list' %}" class="text-sm font-medium text-muted hover:text-ink">Clear</a>{% endif %}
+          </div>
+        </form>
+      </details>
+    </aside>
+
+    <div>
+      {% if page_obj %}
+        <ul class="divide-y divide-line rounded-2xl border border-line bg-white px-6">
+          {% for job in page_obj %}{% include "partials/_job_row.html" %}{% endfor %}
+        </ul>
+        {% include "partials/_pagination.html" %}
+      {% else %}
+        <div class="rounded-2xl border border-dashed border-line bg-white p-10 text-center">
+          <p class="font-display text-xl font-bold">No jobs match these filters</p>
+          <p class="mt-2 text-sm text-muted">Try removing a filter, or widen the education or experience limits.</p>
+          <a href="{% url 'jobs:list' %}" class="mt-5 inline-block rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-tint">Clear all filters</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

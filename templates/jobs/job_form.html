@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}{% if job %}Edit job{% else %}Post a job{% endif %}{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+  <h1 class="font-display text-3xl font-bold">{% if job %}Edit job{% else %}Post a job{% endif %}</h1>
+
+  <form method="post" class="mt-8 space-y-8" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ form.non_field_errors.0 }}</div>
+    {% endif %}
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">The role</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=form.title wide=True %}
+        {% include "partials/_field.html" with field=form.employment_type %}
+        {% include "partials/_field.html" with field=form.work_mode %}
+        {% include "partials/_field.html" with field=form.location wide=True %}
+        {% include "partials/_field.html" with field=form.description wide=True %}
+        {% include "partials/_field.html" with field=form.requirements wide=True %}
+      </div>
+    </fieldset>
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">Who you're looking for</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=form.min_education %}
+        {% include "partials/_field.html" with field=form.min_experience_years %}
+        {% include "partials/_field.html" with field=form.min_cgpa %}
+        {% include "partials/_field.html" with field=form.required_skills %}
+      </div>
+    </fieldset>
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">Pay and timing</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=form.salary_min %}
+        {% include "partials/_field.html" with field=form.salary_max %}
+        {% include "partials/_field.html" with field=form.deadline %}
+        <div class="self-end pb-2">{% include "partials/_field.html" with field=form.is_active %}</div>
+      </div>
+    </fieldset>
+
+    <div class="flex items-center gap-3">
+      <button type="submit" class="rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-white hover:bg-brand-dark">{% if job %}Save changes{% else %}Publish job{% endif %}</button>
+      <a href="{% url 'jobs:employer_dashboard' %}" class="text-sm font-medium text-muted hover:text-ink">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

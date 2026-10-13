@@ -1,0 +1,4 @@
+<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium
+  {% if mode == 'remote' %}border-remote/30 bg-remote/10 text-remote
+  {% elif mode == 'onsite' %}border-onsite/30 bg-onsite/10 text-onsite
+  {% else %}border-brand/30 bg-brand/10 text-brand{% endif %}">{{ label }}</span>

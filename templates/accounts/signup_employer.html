@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Employer sign up{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+  <h1 class="font-display text-3xl font-bold">Create your employer account</h1>
+  <p class="mt-2 text-sm text-muted">Tell us about your company, then post your first job.
+    Already registered? <a href="{% url 'accounts:login' %}" class="font-medium text-brand hover:underline">Log in</a>.</p>
+
+  <form method="post" class="mt-8 space-y-8" novalidate>
+    {% csrf_token %}
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">Your account</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=user_form.first_name %}
+        {% include "partials/_field.html" with field=user_form.last_name %}
+        {% include "partials/_field.html" with field=user_form.email wide=True %}
+        {% include "partials/_field.html" with field=user_form.password1 %}
+        {% include "partials/_field.html" with field=user_form.password2 %}
+      </div>
+    </fieldset>
+
+    <fieldset class="rounded-2xl border border-line bg-white p-6">
+      <legend class="px-2 font-display text-lg font-bold">Company</legend>
+      <div class="grid gap-5 sm:grid-cols-2">
+        {% include "partials/_field.html" with field=profile_form.company_name wide=True %}
+        {% include "partials/_field.html" with field=profile_form.industry %}
+        {% include "partials/_field.html" with field=profile_form.company_size %}
+        {% include "partials/_field.html" with field=profile_form.location %}
+        {% include "partials/_field.html" with field=profile_form.website %}
+      </div>
+    </fieldset>
+
+    <button type="submit" class="w-full rounded-lg bg-ink px-4 py-3 text-sm font-semibold text-white hover:bg-ink/90 sm:w-auto">Create account</button>
+  </form>
+</section>
+{% endblock %}

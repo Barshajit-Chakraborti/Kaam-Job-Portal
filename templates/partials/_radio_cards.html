@@ -1,0 +1,16 @@
+{# Renders a RadioSelect field as selectable cards. Usage: include with field=form.preferred_work_mode #}
+<fieldset class="sm:col-span-2">
+  <legend class="mb-1.5 text-sm font-medium text-ink">{{ field.label }}</legend>
+  <div class="grid gap-3 sm:grid-cols-3">
+    {% for radio in field %}
+      <label for="{{ radio.id_for_label }}" class="cursor-pointer">
+        <input type="radio" id="{{ radio.id_for_label }}" name="{{ radio.data.name }}" value="{{ radio.data.value }}"
+               class="peer sr-only" {% if radio.data.selected %}checked{% endif %}>
+        <span class="block rounded-lg border border-line bg-white px-4 py-3 text-sm font-medium text-ink peer-checked:border-brand peer-checked:bg-tint peer-checked:text-brand peer-focus-visible:ring-2 peer-focus-visible:ring-brand/40">
+          {{ radio.choice_label }}
+        </span>
+      </label>
+    {% endfor %}
+  </div>
+  {% for error in field.errors %}<p class="mt-1.5 text-xs font-medium text-red-600">{{ error }}</p>{% endfor %}
+</fieldset>
