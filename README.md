@@ -2,8 +2,6 @@
 
 A full-stack job portal built with **Django** and **Tailwind CSS**. Employers post openings and review applicants; job seekers search, filter and apply. Both sides have role-based accounts and powerful filtering.
 
-> Rename the product by changing `SITE_NAME` in `config/settings.py`.
-
 ## Features
 
 **Home page**
@@ -50,19 +48,6 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 python manage.py makemigrations accounts jobs
 python manage.py migrate
 
-# 3. Run
-python manage.py runserver
-```
-
-| Role | Email |
-|------|-------|
-| Employer | `hr@northwind.example` |
-| Job seeker | `ananya.das@student.example` |
-
-Create an admin with `python manage.py createsuperuser` and visit `/admin/`.
-
-Run the tests: `python manage.py test`
-
 ## Tailwind
 
 Out of the box the templates load Tailwind from its CDN, so no Node.js is needed to run the project.
@@ -79,17 +64,10 @@ If you change colours or fonts, update both `tailwind.config.js` and the inline 
 ## Project structure
 
 ```
-config/        settings, root urls, wsgi/asgi
+job_portal/        settings, root urls, wsgi/asgi
 core/          home page, shared Tailwind form mixin, template tags
 accounts/      custom User, SeekerProfile, EmployerProfile, signup/login/profile
 jobs/          Job, Application, filters.py, employer + seeker views, seed_demo command
 templates/     base layout, partials, page templates
 static/        app.css, app.js, Tailwind source
 ```
-
-## Resume bullets (edit to match what you did)
-
-- Built a two-role job portal (employers and job seekers) with Django 5 and Tailwind CSS, featuring a custom email-based user model and role-based access control.
-- Implemented multi-criteria filtering: seekers filter jobs by work mode, education and salary; employers filter applicants by education, branch, graduation year, CGPA, skills and preferred job type.
-- Designed relational schema with database constraints, object-level permissions and protected file downloads; wrote 30+ unit and integration tests.
-- Added deployment configuration (Gunicorn, WhiteNoise, environment-based settings) and a data-seeding command for demos.
